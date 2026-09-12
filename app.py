@@ -1114,12 +1114,15 @@ def _fit_font_size(pdf: FPDF, style: str, text: str, target: float,
 
 
 def _configure_pdf_fonts(pdf: FPDF) -> None:
-    """تحديد ملف الخط المرفوع بدقة."""
-    try:
-        pdf.add_font("DejaVu", "", "DejaVuSans-ExtraLight.ttf")
-        pdf.add_font("DejaVu", "B", "DejaVuSans-ExtraLight.ttf")
-    except Exception:
-        pass
+    """تحميل الخط العربي وتثبيته لجميع الأنماط."""
+    font_path = "DejaVuSans.ttf"
+    
+    pdf.add_font("DejaVu", "", font_path)
+    pdf.add_font("DejaVu", "B", font_path)
+    pdf.add_font("DejaVu", "I", font_path)
+    
+    pdf.set_font("DejaVu", size=10)
+
 
 
 
