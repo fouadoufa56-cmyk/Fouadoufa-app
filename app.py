@@ -1114,11 +1114,11 @@ def _fit_font_size(pdf: FPDF, style: str, text: str, target: float,
 
 
 def _configure_pdf_fonts(pdf: FPDF) -> None:
-    """يضمن ظهور أسماء المواد والأساتذة العربية داخل ملفات PDF."""
-    if FONT_REGULAR.exists() and FONT_BOLD.exists():
-        pdf.add_font("DejaVu", "", str(FONT_REGULAR))
-        pdf.add_font("DejaVu", "B", str(FONT_BOLD))
-
+    """إلغاء شرط وجود الملفات لمنع خطأ الترميز."""
+    try:
+        pdf.add_font("DejaVu", "", "DejaVuSans", uni=True)
+    except Exception:
+        pass
 
 def _header_lines(value: str) -> list[str]:
     return [line.strip() for line in str(value or "").splitlines() if line.strip()]
