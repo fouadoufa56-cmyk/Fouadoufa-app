@@ -1114,12 +1114,13 @@ def _fit_font_size(pdf: FPDF, style: str, text: str, target: float,
 
 
 def _configure_pdf_fonts(pdf: FPDF) -> None:
-    """تحميل الخط العربي المرفوع بنجاح."""
+    """تحديد ملف الخط المرفوع بدقة."""
     try:
-        pdf.add_font("DejaVu", "", "DejaVuSans.ttf")
-        pdf.add_font("DejaVu", "B", "DejaVuSans.ttf")
+        pdf.add_font("DejaVu", "", "DejaVuSans-ExtraLight.ttf")
+        pdf.add_font("DejaVu", "B", "DejaVuSans-ExtraLight.ttf")
     except Exception:
         pass
+
 
 
 def _header_lines(value: str) -> list[str]:
