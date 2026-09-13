@@ -1544,8 +1544,8 @@ def generate_pdf(
     TT = 3 + ADMIN_H + 2
     _draw_group_table(pdf, df, ML, TT, W - ML - MR, H - TT - 6, font_scale=1.0)
     _draw_footer(pdf)
-        return pdf.output(dest='S').encode('latin-1')
-    )
+    return bytes(pdf.output())
+    
 def generate_all_pdf(
     title: str, date_str: str, left_header: str = "", right_header: str = ""
 ) -> bytes:
