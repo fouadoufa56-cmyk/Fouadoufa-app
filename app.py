@@ -1133,16 +1133,35 @@ st.write("---")
 # ═══════════════════════════════════════════════════════════════════════════════
 # دوال رسم PDF
 # ═══════════════════════════════════════════════════════════════════════════════
-FONT_DIR = Path(__file__).resolve().parent / "fonts"
+FONT_LOCATIONS = [
+    Path(__file__).resolve().parent / "fonts",
+    Path(__file__).resolve().parent / "artifacts" / "timetable" / "fonts",
+    Path.cwd() / "fonts",
+    Path.cwd() / "artifacts" / "timetable" / "fonts",
+]
+
+FONT_DIR = next(
+    (
+        location
+        for location in FONT_LOCATIONS
+        if (location / "DejaVuSans.ttf").exists()
+        and (location / "DejaVuSans-Bold.ttf").exists()
+    ),
+    None,
+)
+
+if FONT_DIR is None:
+    st.error(
+        "ملفات الخط العربي غير موجودة. "
+        "أضف المجلد fonts وبداخله DejaVuSans.ttf "
+        "وDejaVuSans-Bold.ttf إلى مستودع GitHub، "
+        "ثم أعد تشغيل التطبيق."
+    )
+    st.stop()
+
 FONT_REGULAR = FONT_DIR / "DejaVuSans.ttf"
 FONT_BOLD = FONT_DIR / "DejaVuSans-Bold.ttf"
-PDF_FONT = "DejaVu" if FONT_REGULAR.exists() and FONT_BOLD.exists() else "Helvetica"
-
-if PDF_FONT == "Helvetica":
-    raise RuntimeError(
-        "Arabic PDF fonts are missing. "
-        "Expected fonts/DejaVuSans.ttf and fonts/DejaVuSans-Bold.ttf."
-    )
+PDF_FONT = "DejaVu"
 
 NAVY = (12, 35, 80)
 BLUE = (28, 72, 155)
