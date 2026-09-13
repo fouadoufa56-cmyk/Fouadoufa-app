@@ -1,4 +1,6 @@
-pandas
 streamlit
-fpdf2
+pandas
+fpdf
+arabic-reshaper
+python-bidi
 openpyxl
