@@ -1133,9 +1133,16 @@ st.write("---")
 # ═══════════════════════════════════════════════════════════════════════════════
 # دوال رسم PDF
 # ═══════════════════════════════════════════════════════════════════════════════
-FONT_REGULAR = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
-FONT_BOLD = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf")
+FONT_DIR = Path(__file__).resolve().parent / "fonts"
+FONT_REGULAR = FONT_DIR / "DejaVuSans.ttf"
+FONT_BOLD = FONT_DIR / "DejaVuSans-Bold.ttf"
 PDF_FONT = "DejaVu" if FONT_REGULAR.exists() and FONT_BOLD.exists() else "Helvetica"
+
+if PDF_FONT == "Helvetica":
+    raise RuntimeError(
+        "Arabic PDF fonts are missing. "
+        "Expected fonts/DejaVuSans.ttf and fonts/DejaVuSans-Bold.ttf."
+    )
 
 NAVY = (12, 35, 80)
 BLUE = (28, 72, 155)
@@ -1545,7 +1552,8 @@ def generate_pdf(
     _draw_group_table(pdf, df, ML, TT, W - ML - MR, H - TT - 6, font_scale=1.0)
     _draw_footer(pdf)
     return bytes(pdf.output())
-    
+
+
 def generate_all_pdf(
     title: str, date_str: str, left_header: str = "", right_header: str = ""
 ) -> bytes:
