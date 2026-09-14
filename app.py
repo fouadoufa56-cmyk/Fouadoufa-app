@@ -7,8 +7,12 @@ import streamlit as st
 from fpdf import FPDF
 import arabic_reshaper
 from bidi.algorithm import get_display
+from streamlit_local_storage import LocalStorage
+
 
 st.set_page_config(layout="wide", page_title="جدول الحصص")
+localS = LocalStorage()
+
 
 DEFAULT_PAGE_COUNT = 3
 DEFAULT_PAGE_NAMES = {
@@ -17,6 +21,11 @@ DEFAULT_PAGE_NAMES = {
     "3": "السنة الثالثة",
 }
 DEFAULT_PAGE = "2"
+saved_data = localS.getItem("user_schedule_data")
+
+if st.sidebar.button("🗑️ إفراغ البيانات وإعادة الضبط"):
+    localS.deleteItem("user_schedule_data")
+    st.rerun()
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # الإعدادات الافتراضية
