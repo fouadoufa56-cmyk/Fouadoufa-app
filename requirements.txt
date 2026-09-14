@@ -4,3 +4,4 @@ fpdf2>=2.7.8
 openpyxl>=3.1
 arabic-reshaper>=3.0.1
 python-bidi>=0.6.11
+streamlit-local-storage
