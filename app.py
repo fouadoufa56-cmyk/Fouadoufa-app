@@ -548,26 +548,31 @@ with st.sidebar.expander("🗂️ إدارة الصفحات", expanded=False):
         page_name_inputs[page_id] = st.text_input(
             f"اسم الصفحة {page_id}",
             key=page_name_key,
+                page_name_inputs[page_id] = st.text_input(
+            f"اسم الصفحة {page_id}",
+            key=page_name_key,
         )
 
-    if st.button("💾 حفظ أسماء الصفحات", use_container_width=True):
-        page_errors = []
-        cleaned_page_names = {}
-        for page_id, page_name in page_name_inputs.items():
-            page_name = str(page_name).strip()
-            if not page_name:
-                page_errors.append(f"أدخل اسم الصفحة {page_id}.")
-            elif page_name in cleaned_page_names.values():
-                page_errors.append(f"اسم الصفحة «{page_name}» مكرر.")
-            cleaned_page_names[page_id] = page_name
+cleaned_page_names = {}
 
-        if page_errors:
-            for error in page_errors:
-                st.error(error)
-        else:
-            _apply_page_configuration(cleaned_page_names)
-            st.session_state["_page_config_notice"] = "تم حفظ أسماء الصفحات بنجاح."
-            st.rerun()
+if st.button("💾 حفظ أسماء الصفحات", use_container_width=True):
+    page_errors = []
+    cleaned_page_names = {}
+    for page_id, page_name in page_name_inputs.items():
+        page_name = str(page_name).strip()
+        if not page_name:
+            page_errors.append(f"ادخل اسم الصفحة {page_id}")
+        elif page_name in cleaned_page_names.values():
+            page_errors.append(f"اسم الصفحة {page_name} مكرر")
+        cleaned_page_names[page_id] = page_name
+
+    if page_errors:
+        for error in page_errors:
+            st.error(error)
+    else:
+        _apply_page_configuration(cleaned_page_names)
+        st.session_state["page_config_notice"] = "تم حفظ أسماء الصفحات بنجاح"
+        st.rerun()
 
 if st.session_state.pop("_page_config_notice", None):
     st.success("تم حفظ أسماء الصفحات بنجاح.")
