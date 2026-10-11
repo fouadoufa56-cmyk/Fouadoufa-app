@@ -1,0 +1,712 @@
+{
+  "saved_at": "2026-09-20T20:25:49.192721",
+  "page_config": {
+    "page_count": 4,
+    "page_names": {
+      "1": "السنة الأولى",
+      "2": "السنة الثانية",
+      "3": "السنة الثالثة",
+      "4": "الصفحة 4"
+    }
+  },
+  "pages": {
+    "2": {
+      "settings": {
+        "pdf_date": "2026-09-20",
+        "group_count": 4,
+        "group_names": {
+          "A": "TS2A",
+          "B": "TS2B",
+          "C": "TS2C",
+          "D": "TS2D"
+        },
+        "courses_data": {
+          "RDM": [
+            "Pr. ALAMI",
+            "Pr. BENNANI"
+          ],
+          "MEC DES SOLS": [
+            "Pr. CHEMAOU",
+            "Pr. IDRISSI"
+          ],
+          "METRE": [
+            "Pr. JAWADI",
+            "Pr. TOUATI"
+          ],
+          "DAO (AUTOCAD)": [
+            "Pr. ROUSSAFI"
+          ],
+          "TOPOGRAPHIE": [
+            "Pr. MESKINE",
+            "Pr. TAZI"
+          ],
+          "CALCUL DE STRUCTURE": [
+            "Pr. JOUDA"
+          ]
+        },
+        "active_courses": [
+          "RDM",
+          "MEC DES SOLS",
+          "METRE",
+          "DAO (AUTOCAD)",
+          "TOPOGRAPHIE",
+          "CALCUL DE STRUCTURE"
+        ],
+        "rooms": [],
+        "time_slots": [
+          {
+            "start": "08:30",
+            "end": "10:25"
+          },
+          {
+            "start": "10:35",
+            "end": "12:30"
+          },
+          {
+            "start": "13:15",
+            "end": "15:10"
+          },
+          {
+            "start": "15:20",
+            "end": "17:15"
+          }
+        ],
+        "pdf_left_header": "ROYAUME DU MAROC\nMINISTERE DE L'INTERIEUR\nDIRECTION DU DEVELOPPEMENT DES COMPETENCES\nET DE LA TRANSFORMATION DIGITALE\nI.F.T.T.S CASA",
+        "pdf_right_header": "EMPLOI DU TEMPS TECHNICIENS SPECIALISES GENIE CIVIL - السنة الثانية"
+      },
+      "widgets": {
+        "r_D_3_4": "-- اختر القاعة --",
+        "r_B_2_1": "-- اختر القاعة --",
+        "link_D_3_3": true,
+        "c_A_4_0": "-- فارغ --",
+        "r_B_0_0": "-- اختر القاعة --",
+        "r_D_4_1": "-- اختر القاعة --",
+        "r_B_3_4": "-- اختر القاعة --",
+        "c_C_4_3": "-- فارغ --",
+        "link_B_0_0": true,
+        "r_D_1_3": "-- اختر القاعة --",
+        "r_B_2_4": "-- اختر القاعة --",
+        "c_C_3_0": "-- فارغ --",
+        "link_B_4_3": true,
+        "link_D_4_4": true,
+        "r_B_2_3": "-- اختر القاعة --",
+        "c_A_4_1": "-- فارغ --",
+        "r_D_3_0": "-- اختر القاعة --",
+        "c_A_2_4": "-- فارغ --",
+        "r_A_0_0": "-- اختر القاعة --",
+        "link_B_1_3": true,
+        "link_D_4_3": true,
+        "link_D_2_1": true,
+        "r_A_0_3": "-- اختر القاعة --",
+        "link_D_1_1": true,
+        "link_B_2_4": true,
+        "c_A_1_3": "-- فارغ --",
+        "r_B_4_0": "-- اختر القاعة --",
+        "r_D_2_1": "-- اختر القاعة --",
+        "link_B_3_1": true,
+        "c_C_2_3": "-- فارغ --",
+        "r_D_2_0": "-- اختر القاعة --",
+        "link_D_1_4": true,
+        "r_B_3_1": "-- اختر القاعة --",
+        "r_D_2_3": "-- اختر القاعة --",
+        "r_D_1_4": "-- اختر القاعة --",
+        "c_A_1_0": "-- فارغ --",
+        "link_D_2_0": true,
+        "link_D_0_4": true,
+        "link_B_0_3": true,
+        "r_B_4_4": "-- اختر القاعة --",
+        "link_D_3_4": true,
+        "r_D_0_1": "-- اختر القاعة --",
+        "link_B_4_0": true,
+        "r_D_2_4": "-- اختر القاعة --",
+        "link_B_3_3": true,
+        "link_D_1_3": true,
+        "r_B_0_3": "-- اختر القاعة --",
+        "r_B_1_3": "-- اختر القاعة --",
+        "r_D_4_0": "-- اختر القاعة --",
+        "c_C_0_1": "-- فارغ --",
+        "link_D_3_1": true,
+        "c_C_1_4": "-- فارغ --",
+        "link_B_0_4": true,
+        "c_A_2_0": "-- فارغ --",
+        "r_D_0_3": "-- اختر القاعة --",
+        "link_B_4_1": true,
+        "c_A_3_0": "-- فارغ --",
+        "r_B_2_0": "-- اختر القاعة --",
+        "c_C_1_3": "-- فارغ --",
+        "link_B_2_1": true,
+        "link_B_3_0": true,
+        "c_A_0_4": "-- فارغ --",
+        "link_D_0_0": true,
+        "link_D_0_1": true,
+        "r_D_4_3": "-- اختر القاعة --",
+        "link_D_2_3": true,
+        "c_C_2_0": "-- فارغ --",
+        "r_B_4_3": "-- اختر القاعة --",
+        "r_D_3_3": "-- اختر القاعة --",
+        "c_A_1_1": "-- فارغ --",
+        "r_D_4_4": "-- اختر القاعة --",
+        "r_B_1_0": "-- اختر القاعة --",
+        "c_A_2_1": "-- فارغ --",
+        "t_A_0_3_MEC DES SOLS": "Pr. CHEMAOU",
+        "r_D_1_0": "-- اختر القاعة --",
+        "link_D_4_0": true,
+        "r_B_4_1": "-- اختر القاعة --",
+        "r_B_3_3": "-- اختر القاعة --",
+        "link_B_4_4": true,
+        "c_C_1_0": "-- فارغ --",
+        "t_A_0_1_RDM": "Pr. ALAMI",
+        "e_A_0_0": "Controle",
+        "c_C_0_3": "-- فارغ --",
+        "link_B_0_1": true,
+        "c_C_4_0": "-- فارغ --",
+        "c_C_4_1": "-- فارغ --",
+        "r_D_3_1": "-- اختر القاعة --",
+        "link_B_3_4": true,
+        "link_B_1_0": true,
+        "c_C_3_1": "-- فارغ --",
+        "r_A_0_1": "-- اختر القاعة --",
+        "link_B_1_4": true,
+        "c_A_4_4": "-- فارغ --",
+        "c_A_0_0": "TOPOGRAPHIE",
+        "c_C_4_4": "-- فارغ --",
+        "c_A_3_3": "-- فارغ --",
+        "r_B_1_4": "-- اختر القاعة --",
+        "c_C_2_4": "-- فارغ --",
+        "link_D_3_0": true,
+        "t_A_0_0_TOPOGRAPHIE": "Pr. MESKINE",
+        "m_A_0_1": false,
+        "c_C_0_0": "-- فارغ --",
+        "c_A_1_4": "-- فارغ --",
+        "m_A_0_0": false,
+        "r_B_1_1": "-- اختر القاعة --",
+        "r_B_0_4": "-- اختر القاعة --",
+        "c_C_3_4": "-- فارغ --",
+        "r_D_0_0": "-- اختر القاعة --",
+        "c_A_0_1": "RDM",
+        "m_A_0_3": false,
+        "link_B_1_1": true,
+        "c_A_3_1": "-- فارغ --",
+        "link_D_1_0": true,
+        "e_A_0_3": "Cours",
+        "r_B_0_1": "-- اختر القاعة --",
+        "r_B_3_0": "-- اختر القاعة --",
+        "r_D_0_4": "-- اختر القاعة --",
+        "c_C_3_3": "-- فارغ --",
+        "link_B_2_3": true,
+        "link_D_2_4": true,
+        "link_D_0_3": true,
+        "c_C_2_1": "-- فارغ --",
+        "c_C_0_4": "-- فارغ --",
+        "link_D_4_1": true,
+        "link_B_2_0": true,
+        "c_A_4_3": "-- فارغ --",
+        "r_D_1_1": "-- اختر القاعة --",
+        "c_C_1_1": "-- فارغ --",
+        "e_A_0_1": "EFM",
+        "c_A_0_3": "MEC DES SOLS",
+        "c_A_2_3": "-- فارغ --",
+        "c_A_3_4": "-- فارغ --"
+      },
+      "timetables": {
+        "A": {
+          "SLOT_1": {
+            "LUNDI": "[CTRL] TOPOGRAPHIE\n(Pr. MESKINE)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "[EFM] RDM\n(Pr. ALAMI)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "MEC DES SOLS\n(Pr. CHEMAOU)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        },
+        "B": {
+          "SLOT_1": {
+            "LUNDI": "[EFM] RDM\n(Pr. ALAMI)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "[CTRL] TOPOGRAPHIE\n(Pr. MESKINE)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "MEC DES SOLS\n(Pr. CHEMAOU)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        },
+        "C": {
+          "SLOT_1": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        },
+        "D": {
+          "SLOT_1": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        }
+      }
+    },
+    "1": {
+      "settings": {
+        "pdf_date": "2026-09-20",
+        "group_count": 4,
+        "group_names": {
+          "A": "TS1A",
+          "B": "TS1B",
+          "C": "TS1C",
+          "D": "TS1D"
+        },
+        "courses_data": {
+          "RDM": [
+            "Pr. ALAMI",
+            "Pr. BENNANI"
+          ],
+          "MEC DES SOLS": [
+            "Pr. CHEMAOU",
+            "Pr. IDRISSI"
+          ],
+          "METRE": [
+            "Pr. JAWADI",
+            "Pr. TOUATI"
+          ],
+          "DAO (AUTOCAD)": [
+            "Pr. ROUSSAFI"
+          ],
+          "TOPOGRAPHIE": [
+            "Pr. MESKINE",
+            "Pr. TAZI"
+          ],
+          "CALCUL DE STRUCTURE": [
+            "Pr. JOUDA"
+          ]
+        },
+        "active_courses": [
+          "RDM",
+          "MEC DES SOLS",
+          "METRE",
+          "DAO (AUTOCAD)",
+          "TOPOGRAPHIE",
+          "CALCUL DE STRUCTURE"
+        ],
+        "rooms": [],
+        "time_slots": [
+          {
+            "start": "08:30",
+            "end": "10:25"
+          },
+          {
+            "start": "10:35",
+            "end": "12:30"
+          },
+          {
+            "start": "13:15",
+            "end": "15:10"
+          },
+          {
+            "start": "15:20",
+            "end": "17:15"
+          }
+        ],
+        "pdf_left_header": "ROYAUME DU MAROC\nMINISTERE DE L'INTERIEUR\nDIRECTION DU DEVELOPPEMENT DES COMPETENCES\nET DE LA TRANSFORMATION DIGITALE\nI.F.T.T.S CASA",
+        "pdf_right_header": "EMPLOI DU TEMPS TECHNICIENS SPECIALISES GENIE CIVIL - السنة الأولى"
+      },
+      "widgets": {
+        "r_D_3_4": "-- اختر القاعة --",
+        "r_B_2_1": "-- اختر القاعة --",
+        "link_D_3_3": true,
+        "c_A_4_0": "-- فارغ --",
+        "r_B_0_0": "-- اختر القاعة --",
+        "r_D_4_1": "-- اختر القاعة --",
+        "r_B_3_4": "-- اختر القاعة --",
+        "c_C_4_3": "-- فارغ --",
+        "link_B_0_0": true,
+        "r_D_1_3": "-- اختر القاعة --",
+        "r_B_2_4": "-- اختر القاعة --",
+        "c_C_3_0": "-- فارغ --",
+        "link_B_4_3": true,
+        "c_A_4_1": "-- فارغ --",
+        "r_B_2_3": "-- اختر القاعة --",
+        "link_D_4_4": true,
+        "r_D_3_0": "-- اختر القاعة --",
+        "c_A_2_4": "-- فارغ --",
+        "t_A_0_0_CALCUL DE STRUCTURE": "Pr. JOUDA",
+        "r_A_0_0": "-- اختر القاعة --",
+        "link_B_1_3": true,
+        "link_D_4_3": true,
+        "link_D_2_1": true,
+        "r_A_0_3": "-- اختر القاعة --",
+        "link_D_1_1": true,
+        "link_B_2_4": true,
+        "c_A_1_3": "-- فارغ --",
+        "r_B_4_0": "-- اختر القاعة --",
+        "r_D_2_1": "-- اختر القاعة --",
+        "link_B_3_1": true,
+        "c_C_2_3": "-- فارغ --",
+        "r_D_2_0": "-- اختر القاعة --",
+        "link_D_1_4": true,
+        "r_B_3_1": "-- اختر القاعة --",
+        "r_D_2_3": "-- اختر القاعة --",
+        "r_D_1_4": "-- اختر القاعة --",
+        "c_A_1_0": "-- فارغ --",
+        "link_D_2_0": true,
+        "link_D_0_4": true,
+        "link_B_0_3": true,
+        "r_B_4_4": "-- اختر القاعة --",
+        "link_D_3_4": true,
+        "r_D_0_1": "-- اختر القاعة --",
+        "link_B_4_0": true,
+        "r_D_2_4": "-- اختر القاعة --",
+        "link_B_3_3": true,
+        "r_B_0_3": "-- اختر القاعة --",
+        "r_D_4_0": "-- اختر القاعة --",
+        "r_B_1_3": "-- اختر القاعة --",
+        "link_D_1_3": true,
+        "c_C_0_1": "-- فارغ --",
+        "link_D_3_1": true,
+        "c_C_1_4": "-- فارغ --",
+        "link_B_0_4": true,
+        "c_A_2_0": "-- فارغ --",
+        "r_D_0_3": "-- اختر القاعة --",
+        "link_B_4_1": true,
+        "c_A_3_0": "-- فارغ --",
+        "r_B_2_0": "-- اختر القاعة --",
+        "c_C_1_3": "-- فارغ --",
+        "link_B_2_1": true,
+        "link_B_3_0": true,
+        "c_A_0_4": "-- فارغ --",
+        "link_D_0_0": true,
+        "link_D_0_1": true,
+        "r_D_4_3": "-- اختر القاعة --",
+        "link_D_2_3": true,
+        "c_C_2_0": "-- فارغ --",
+        "r_B_4_3": "-- اختر القاعة --",
+        "r_D_3_3": "-- اختر القاعة --",
+        "c_A_1_1": "-- فارغ --",
+        "r_D_4_4": "-- اختر القاعة --",
+        "r_B_1_0": "-- اختر القاعة --",
+        "c_A_2_1": "-- فارغ --",
+        "t_A_0_3_MEC DES SOLS": "Pr. CHEMAOU",
+        "r_D_1_0": "-- اختر القاعة --",
+        "link_D_4_0": true,
+        "r_B_4_1": "-- اختر القاعة --",
+        "r_B_3_3": "-- اختر القاعة --",
+        "link_B_4_4": true,
+        "c_C_1_0": "-- فارغ --",
+        "t_A_0_1_RDM": "Pr. ALAMI",
+        "e_A_0_0": "Cours",
+        "c_C_0_3": "-- فارغ --",
+        "link_B_0_1": true,
+        "c_C_4_0": "-- فارغ --",
+        "c_C_4_1": "-- فارغ --",
+        "r_D_3_1": "-- اختر القاعة --",
+        "link_B_3_4": true,
+        "link_B_1_0": true,
+        "c_C_3_1": "-- فارغ --",
+        "r_A_0_1": "-- اختر القاعة --",
+        "link_B_1_4": true,
+        "c_A_4_4": "-- فارغ --",
+        "c_A_0_0": "CALCUL DE STRUCTURE",
+        "c_A_3_3": "-- فارغ --",
+        "c_C_4_4": "-- فارغ --",
+        "c_C_2_4": "-- فارغ --",
+        "r_B_1_4": "-- اختر القاعة --",
+        "link_D_3_0": true,
+        "m_A_0_1": false,
+        "c_C_0_0": "-- فارغ --",
+        "c_A_1_4": "-- فارغ --",
+        "m_A_0_0": false,
+        "r_B_1_1": "-- اختر القاعة --",
+        "r_B_0_4": "-- اختر القاعة --",
+        "c_C_3_4": "-- فارغ --",
+        "r_D_0_0": "-- اختر القاعة --",
+        "c_A_0_1": "RDM",
+        "m_A_0_3": false,
+        "link_B_1_1": true,
+        "c_A_3_1": "-- فارغ --",
+        "link_D_1_0": true,
+        "e_A_0_3": "Cours",
+        "r_B_0_1": "-- اختر القاعة --",
+        "r_B_3_0": "-- اختر القاعة --",
+        "r_D_0_4": "-- اختر القاعة --",
+        "c_C_3_3": "-- فارغ --",
+        "link_B_2_3": true,
+        "link_D_2_4": true,
+        "link_D_0_3": true,
+        "c_C_2_1": "-- فارغ --",
+        "c_C_0_4": "-- فارغ --",
+        "link_D_4_1": true,
+        "link_B_2_0": true,
+        "c_A_4_3": "-- فارغ --",
+        "r_D_1_1": "-- اختر القاعة --",
+        "c_C_1_1": "-- فارغ --",
+        "e_A_0_1": "Cours",
+        "c_A_0_3": "MEC DES SOLS",
+        "c_A_2_3": "-- فارغ --",
+        "c_A_3_4": "-- فارغ --"
+      },
+      "timetables": {
+        "A": {
+          "SLOT_1": {
+            "LUNDI": "CALCUL DE STRUCTURE\n(Pr. JOUDA)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "RDM\n(Pr. ALAMI)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "MEC DES SOLS\n(Pr. CHEMAOU)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        },
+        "B": {
+          "SLOT_1": {
+            "LUNDI": "RDM\n(Pr. ALAMI)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "CALCUL DE STRUCTURE\n(Pr. JOUDA)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "MEC DES SOLS\n(Pr. CHEMAOU)\n-- اختر القاعة --",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        },
+        "C": {
+          "SLOT_1": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        },
+        "D": {
+          "SLOT_1": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_2": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "PAUSE DEJEUNER": {
+            "LUNDI": "PAUSE DEJEUNER",
+            "MARDI": "PAUSE DEJEUNER",
+            "MERCREDI": "PAUSE DEJEUNER",
+            "JEUDI": "PAUSE DEJEUNER",
+            "VENDREDI": "PAUSE DEJEUNER"
+          },
+          "SLOT_3": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          },
+          "SLOT_4": {
+            "LUNDI": "",
+            "MARDI": "",
+            "MERCREDI": "",
+            "JEUDI": "",
+            "VENDREDI": ""
+          }
+        }
+      }
+    }
+  }
+}

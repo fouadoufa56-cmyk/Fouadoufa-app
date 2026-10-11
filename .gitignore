@@ -1,0 +1,14 @@
+# بيانات حساسة — لا تُرفع لأي مستودع GitHub عام أبداً
+users.json
+user_data/
+
+# ملفات قديمة/مؤقتة تُنشأ تلقائياً أثناء التشغيل
+saved_data.json
+app_errors.log
+.saved_data.lock
+
+# بايثون
+__pycache__/
+*.pyc
+.venv/
+venv/
