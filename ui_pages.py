@@ -6,13 +6,6 @@ import models
 import persistence
 
 
-def render_reset_button(local_storage) -> None:
-    """زر إفراغ التخزين المحلي (localStorage) في المتصفح وإعادة تحميل الصفحة."""
-    if st.sidebar.button("🗑️ إفراغ البيانات وإعادة الضبط"):
-        local_storage.deleteItem("user_schedule_data")
-        st.rerun()
-
-
 def render_page_selector(page_ids: list[str], page_labels: dict[str, str]) -> None:
     st.sidebar.selectbox(
         "صفحة الجدول",

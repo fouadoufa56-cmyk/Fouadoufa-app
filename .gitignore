@@ -1,9 +1,12 @@
 # بيانات حساسة — لا تُرفع لأي مستودع GitHub عام أبداً
 users.json
+sessions.json
 user_data/
 
 # ملفات قديمة/مؤقتة تُنشأ تلقائياً أثناء التشغيل
 saved_data.json
+.streamlit/secrets.toml
+.*.lock
 app_errors.log
 .saved_data.lock
 

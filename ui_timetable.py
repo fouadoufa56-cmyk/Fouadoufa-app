@@ -1,6 +1,6 @@
 """
-الجدول التفاعلي (الطريقة الأولى): تبويب لكل قسم، والأيام صفوف والفترات أعمدة،
-وكل خانة فيها قوائم اختيار (المادة، الأستاذ، القاعة، النوع، جمع).
+الجدول التفاعلي: تبويب لكل قسم، والأيام صفوف والفترات أعمدة، وكل خانة فيها
+قوائم اختيار منفصلة: المادة، ثم الأستاذ، ثم القاعة، ثم النوع، ثم جمع.
 
 الأقسام المرتبطة (القسم الثاني من كل زوج مثل B يتبع A) تُملأ تلقائياً من
 القسم المصدر (نفس المادة والأستاذ في الوقت المقابل؛ القاعة مستقلة)، ويمكن
@@ -15,6 +15,7 @@ import ui_styles
 from constants import EXAM_TYPES
 
 COL_RATIOS = [0.9, 2.0, 2.0, 0.6, 2.0, 2.0]
+EMPTY_COURSE = "-- فارغ --"
 
 
 def render_timetable_tabs(
@@ -123,6 +124,14 @@ def _color_cells(val) -> str:
     return ""
 
 
+def _bare_teacher(teacher: str) -> str:
+    """الأستاذ يُخزَّن داخل الخانة بين قوسين «(Pr. X)»؛ هذي الدالة تُرجع الاسم بدونهما."""
+    teacher = str(teacher).strip()
+    if teacher.startswith("(") and teacher.endswith(")"):
+        teacher = teacher[1:-1].strip()
+    return teacher
+
+
 def _room_for_cell(sel_room, room_options) -> str:
     """«-- اختر القاعة --» تعني بلا قاعة (لا تُكتب داخل الخانة ولا في PDF)."""
     return "" if sel_room == room_options[0] else sel_room
@@ -162,17 +171,38 @@ def _render_cell(
         return
 
     ck = state_keys.course_key(g, di, si)
-    if ck in st.session_state and st.session_state[ck] not in active_course_list:
-        st.session_state[ck] = "-- فارغ --"
+    if st.session_state.get(ck) not in active_course_list:
+        st.session_state[ck] = _initial_course(
+            g, day, di, si, slot, courses_data, active_course_list
+        )
     sel_course = st.selectbox(
         "م", active_course_list, key=ck, label_visibility="collapsed"
     )
 
-    if sel_course != "-- فارغ --":
+    if sel_course != EMPTY_COURSE:
         _render_manual_cell(g, day, di, si, slot, sel_course, room_options, courses_data)
     else:
         st.session_state.timetables[g].at[day, slot] = ""
         st.session_state.pop(state_keys.room_key(g, di, si), None)
+
+
+def _initial_course(g, day, di, si, slot, courses_data, active_course_list) -> str:
+    """القيمة الابتدائية لقائمة المادة عندما لا تكون محفوظة بشكل صالح.
+
+    - بصيغة «المادة — الأستاذ» (من نسخة سابقة): نفصلهما.
+    - غير ذلك: نقرأ المادة من الخانة المخزَّنة بالجدول (مثلاً عند إلغاء الربط).
+    - لو المادة خارج «مواد هذا الأسبوع» تُفرَّغ الخانة (كما كان دائماً).
+    """
+    current = st.session_state.get(state_keys.course_key(g, di, si))
+    if isinstance(current, str):
+        for course in courses_data:
+            if course != EMPTY_COURSE and current.startswith(f"{course} — "):
+                teacher = current[len(course) + 3 :]
+                if course in active_course_list and teacher in courses_data[course]:
+                    st.session_state[state_keys.teacher_key(g, di, si, course)] = teacher
+                    return course
+    course = models.cell_parts(st.session_state.timetables[g].at[day, slot])[1]
+    return course if course in active_course_list else EMPTY_COURSE
 
 
 def _render_linked_cell(
@@ -210,23 +240,36 @@ def _render_linked_cell(
 def _render_manual_cell(
     g, day, di, si, slot, sel_course, room_options, courses_data
 ) -> None:
+    stored_prefix, _, stored_teacher, stored_room = models.cell_parts(
+        st.session_state.timetables[g].at[day, slot]
+    )
+
     tk = state_keys.teacher_key(g, di, si, sel_course)
+    if tk not in st.session_state and _bare_teacher(stored_teacher) in courses_data[sel_course]:
+        st.session_state[tk] = _bare_teacher(stored_teacher)  # عند إلغاء الربط مثلاً
     sel_teacher = st.selectbox(
         "أ", courses_data[sel_course], key=tk, label_visibility="collapsed"
     )
 
     rk = state_keys.room_key(g, di, si)
-    current_room = models.cell_parts(st.session_state.timetables[g].at[day, slot])[3]
     if rk not in st.session_state or st.session_state[rk] not in room_options:
         st.session_state[rk] = (
-            current_room if current_room in room_options else room_options[0]
+            stored_room if stored_room in room_options else room_options[0]
         )
     sel_room = st.selectbox("القاعة", room_options, key=rk, label_visibility="collapsed")
 
     ek = state_keys.exam_type_key(g, di, si)
+    if ek not in st.session_state:
+        st.session_state[ek] = (
+            "EFM" if "[EFM]" in stored_prefix
+            else "Controle" if "[CTRL]" in stored_prefix
+            else EXAM_TYPES[0]
+        )
     sel_exam = st.selectbox("ن", EXAM_TYPES, key=ek, label_visibility="collapsed")
 
     mk = state_keys.merge_key(g, di, si)
+    if mk not in st.session_state:
+        st.session_state[mk] = "[MERGE]" in stored_prefix
     merged = st.checkbox("جمع", key=mk, help="جمع مجموعتين — لا يُعطي تعارض")
 
     prefix = ""

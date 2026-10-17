@@ -17,8 +17,8 @@
 """
 
 import streamlit as st
-from streamlit_local_storage import LocalStorage
 
+import browser_store
 import models
 import pdf_export
 import persistence
@@ -43,13 +43,18 @@ def main() -> None:
     if not ui_auth.render_login_gate():
         return
 
-    local_storage = LocalStorage()
+    username = st.session_state["auth_user"]
+    ui_auth.render_session_cookie()
     ui_auth.render_logout_button()
-    ui_pages.render_reset_button(local_storage)
+
+    # نقرأ نسخة المتصفح قبل تحميل البيانات، ليُفتح الأحدث بين السيرفر والمتصفح
+    browser_store.read_copy(username)
 
     # ── تحميل البيانات عند أول تشغيل للجلسة ──────────────────────────────
     st.session_state.setdefault("selected_page", DEFAULT_PAGE)
     persistence.load_saved_data()
+    if st.session_state.pop("_restored_from_browser", False):
+        st.success("♻️ استُعيد جدولك من نسخة المتصفح (كانت أحدث من نسخة السيرفر).")
 
     current_page = st.session_state.get("_loaded_page", DEFAULT_PAGE)
     page_ids = models.page_ids(
@@ -110,14 +115,17 @@ def main() -> None:
     )
     st.write("---")
 
+    # ── حفظ تلقائي بعد كل تعديل ───────────────────────────────────────────
+    # يأتي قبل قسم التحميل عمداً: لو فشل توليد PDF أو غاب مجلد الخطوط
+    # (st.stop) يبقى كل ما عدّلته محفوظاً.
+    persistence.save_data()
+    browser_store.write_copy(username)
+
     # ── التحميل (PDF / Excel) ─────────────────────────────────────────────
     pdf_export.ensure_fonts_or_stop()
     ui_downloads.render_downloads(
         groups, group_names, slots, days, pdf_title, pdf_left_header, pdf_right_header
     )
-
-    # ── حفظ تلقائي في نهاية كل تشغيل ──────────────────────────────────────
-    persistence.save_data()
 
 
 if __name__ == "__main__":

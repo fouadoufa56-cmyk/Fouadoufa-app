@@ -49,6 +49,9 @@ LEGACY_TIME_SLOT_KEYS = [
 # ─── حسابات المستخدمين (لكل مستخدم بياناته الخاصة) ───────────────────────────
 DATA_DIR = Path(__file__).parent / "user_data"
 USERS_FILE = Path(__file__).parent / "users.json"
+SESSIONS_FILE = Path(__file__).parent / "sessions.json"
+SESSION_COOKIE = "tt_session"
+SESSION_DAYS = 30  # مدة بقاء تسجيل الدخول بعد آخر دخول، حتى لو حدّثت الصفحة أو أغلقت المتصفح
 
 # ─── التخزين القديم (قبل إضافة الحسابات) ─────────────────────────────────────
 # يُستخدم فقط لترحيل البيانات القديمة تلقائياً إلى أول حساب يُنشأ — راجع

@@ -1,24 +1,22 @@
 """
-كل ما يخص القراءة والكتابة: تحميل ملف حساب المستخدم الحالي، تبديل الصفحات،
-تطبيق إعدادات جديدة على الجداول الحالية، وحفظ كل شيء في نهاية كل تشغيل.
+كل ما يخص القراءة والكتابة: تحميل بيانات المستخدم الحالي، تبديل الصفحات،
+تطبيق إعدادات جديدة على الجداول الحالية، وحفظ كل شيء بعد كل تعديل.
 
-كل مستخدم له ملف بيانات خاص به تحت ``constants.DATA_DIR`` (اسمه مبني من اسم
-المستخدم بعد تنظيفه من أي رمز غير آمن لاسم ملف). لا يوجد أي ملف مشترك بين
-المستخدمين بعد الآن — راجع ``auth.py`` لتسجيل الدخول/الحسابات.
+التخزين الفعلي (ملفات محلية أو قاعدة Supabase) في ``storage.py``. لكل مستخدم
+سجل بيانات خاص به لا يشاركه أحد — راجع ``auth.py`` للحسابات.
 """
 
 import hashlib
 import json
-import re
 from datetime import date, datetime
-from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 
 import models
+import storage
 from applog import logger
 from constants import (
-    DATA_DIR,
     DEFAULT_PAGE,
     DEFAULT_PAGE_COUNT,
     DEFAULT_PAGE_NAMES,
@@ -26,32 +24,10 @@ from constants import (
     LEGACY_TIME_SLOT_KEYS,
     PROFILE_KEY_PREFIXES,
 )
-from file_lock import locked
-
-import pandas as pd
-
-_SAFE_USERNAME = re.compile(r"[^A-Za-z0-9_\-]")
 
 
-def user_data_file(username: str) -> Path:
-    """مسار ملف بيانات هذا المستخدم (يُنشئ مجلد user_data لو ما كان موجوداً)."""
-    safe = _SAFE_USERNAME.sub("", username or "") or "user"
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    return DATA_DIR / f"{safe}.json"
-
-
-def user_lock_file(username: str) -> Path:
-    safe = _SAFE_USERNAME.sub("", username or "") or "user"
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    return DATA_DIR / f".{safe}.lock"
-
-
-def _current_data_file() -> Path:
-    return user_data_file(st.session_state.get("auth_user", ""))
-
-
-def _current_lock_file() -> Path:
-    return user_lock_file(st.session_state.get("auth_user", ""))
+def _username() -> str:
+    return st.session_state.get("auth_user", "")
 
 
 def _clear_profile_session() -> None:
@@ -213,19 +189,53 @@ def _current_profile() -> dict:
     return {"settings": settings, "widgets": widgets, "timetables": timetables}
 
 
+def _browser_copy() -> dict | None:
+    """نسخة البيانات المحفوظة بالمتصفح (إن وُجدت وكانت صالحة)."""
+    raw = st.session_state.get("_browser_raw")
+    if not raw:
+        return None
+    try:
+        data = json.loads(raw)
+        return data if isinstance(data, dict) else None
+    except Exception:
+        logger.warning("نسخة المتصفح غير صالحة، تم تجاهلها.")
+        return None
+
+
+def _pick_newest(server: dict | None, browser: dict | None):
+    """يختار الأحدث (بحسب saved_at) بين نسخة السيرفر ونسخة المتصفح."""
+    if server is None:
+        return browser, ("browser" if browser is not None else None)
+    if browser is None:
+        return server, "server"
+    if str(browser.get("saved_at", "")) > str(server.get("saved_at", "")):
+        return browser, "browser"
+    return server, "server"
+
+
 def load_saved_data() -> None:
     """يحمّل ملف حساب المستخدم الحالي، مع تحويل الملف القديم إلى الصفحة الثانية."""
     requested_page = st.session_state.get("selected_page", DEFAULT_PAGE)
-    data_file = _current_data_file()
 
     if "_page_profiles" not in st.session_state:
         profiles = {}
         page_count = DEFAULT_PAGE_COUNT
         page_names = dict(DEFAULT_PAGE_NAMES)
-        if data_file.exists():
+        try:
+            saved = storage.get("data", _username())
+        except storage.StorageError:
+            # لا نبدأ ببيانات فارغة: أي حفظ لاحق كان سيمسح بياناتك الحقيقية
+            st.error(
+                "⚠️ تعذّر تحميل بياناتك من مكان التخزين. لم يتغيّر شيء، ولن يُحفظ "
+                "أي شيء الآن حتى لا تُستبدل بياناتك. أعد تحميل الصفحة بعد قليل، "
+                "ولو استمرت المشكلة راجع ملف app_errors.log."
+            )
+            st.stop()
+        saved, source = _pick_newest(saved, _browser_copy())
+        if source == "browser":
+            st.session_state["_restored_from_browser"] = True
+        if saved is not None:
             try:
-                with locked(_current_lock_file()):
-                    saved = json.loads(data_file.read_text(encoding="utf-8"))
                 page_config = saved.get("page_config", {})
                 try:
                     page_count = max(
@@ -249,10 +259,14 @@ def load_saved_data() -> None:
                     # تنسيق النسخة السابقة كان خاصاً بالصفحة الثانية.
                     profiles = {DEFAULT_PAGE: saved}
             except Exception:
-                logger.exception(
-                    "تعذّرت قراءة %s — سيبدأ التطبيق ببيانات فارغة.", data_file
+                logger.exception("بنية بياناتك المحفوظة غير مفهومة.")
+                st.error(
+                    "⚠️ بياناتك المحفوظة بصيغة غير متوقعة، فتوقف التطبيق حفاظاً عليها. "
+                    "راجع ملف app_errors.log."
                 )
-                profiles = {}
+                st.stop()
+            st.session_state["_saved_at"] = saved.get("saved_at", "")
+            st.session_state["_browser_payload"] = json.dumps(saved, ensure_ascii=False)
         st.session_state["_page_profiles"] = profiles
         st.session_state["_page_count"] = page_count
         st.session_state["_page_names"] = page_names
@@ -295,7 +309,7 @@ def _build_payload_data() -> dict:
 
 
 def save_data() -> None:
-    """يحفظ إعدادات وجداول كل صفحة في ملف واحد.
+    """يحفظ إعدادات وجداول كل صفحات المستخدم في سجل واحد.
 
     يتجاهل الحفظ إن كانت البيانات مطابقة تماماً لآخر نسخة محفوظة (مثلاً فتح
     المستخدم قائمة منسدلة دون تغيير أي قيمة فعلية) لتفادي إعادة كتابة الملف
@@ -311,16 +325,14 @@ def save_data() -> None:
         return  # لا شيء تغيّر فعلياً منذ آخر حفظ — لا داعي لإعادة الكتابة
 
     payload = {"saved_at": datetime.now().isoformat(), **payload_data}
-    data_file = _current_data_file()
+    # نسخة المتصفح تُحدَّث أولاً، فتبقى تعديلاتك محفوظة حتى لو تعذّر الحفظ على السيرفر
+    st.session_state["_browser_payload"] = json.dumps(payload, ensure_ascii=False)
     try:
-        with locked(_current_lock_file()):
-            data_file.write_text(
-                json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
-            )
-    except Exception:
-        logger.exception("تعذّر حفظ %s.", data_file)
-        st.warning("⚠️ تعذّر حفظ البيانات على القرص. حاول مرة أخرى.")
+        storage.put("data", _username(), payload)
+    except storage.StorageError:
+        st.warning("⚠️ تعذّر حفظ البيانات. حاول مرة أخرى بعد قليل.")
         return
+    st.session_state["_saved_at"] = payload["saved_at"]
     st.session_state["_last_saved_fingerprint"] = fingerprint
 
 

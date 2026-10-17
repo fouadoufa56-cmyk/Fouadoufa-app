@@ -1,6 +1,5 @@
 """واجهة الإعدادات: الأقسام، المواد والأساتذة، القاعات، توقيت الحصص، رأس PDF."""
 
-import json
 from datetime import datetime, time
 
 import streamlit as st
@@ -13,17 +12,13 @@ from constants import DEFAULT_TIME_SLOTS, LEGACY_COURSES_DATA
 
 def render_header(page_label: str) -> None:
     st.title(f"📆 نظام جدولة الحصص والامتحانات — {page_label}")
-    data_file = persistence.user_data_file(st.session_state.get("auth_user", ""))
-    if data_file.exists():
+    saved_at = st.session_state.get("_saved_at", "")
+    if saved_at:
         try:
-            saved_at = json.loads(data_file.read_text(encoding="utf-8")).get(
-                "saved_at", ""
-            )
-            if saved_at:
-                dt = datetime.fromisoformat(saved_at)
-                st.caption(f"💾 آخر حفظ: {dt.strftime('%d/%m/%Y  %H:%M:%S')}")
+            dt = datetime.fromisoformat(saved_at)
+            st.caption(f"💾 آخر حفظ: {dt.strftime('%d/%m/%Y  %H:%M:%S')}")
         except Exception:
-            logger.warning("تعذّرت قراءة وقت آخر حفظ من %s.", data_file)
+            logger.warning("وقت آخر حفظ غير صالح: %r", saved_at)
     st.write("---")
 
 

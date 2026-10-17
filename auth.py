@@ -1,6 +1,8 @@
 """
 حسابات المستخدمين — كل مستخدم له اسم دخول وكلمة مرور خاصة به، وبيانات جدوله
-منفصلة تماماً عن بقية المستخدمين (راجع ``persistence.user_data_file``).
+منفصلة تماماً عن بقية المستخدمين.
+
+كل القراءة والكتابة تمر عبر ``storage.py`` (ملفات محلية أو Supabase).
 
 تنبيه أمني مهم
 ---------------
@@ -8,18 +10,19 @@
 نظاماً أمنياً كاملاً لموقع عام مفتوح للجميع:
 - لا يوجد تحقق من البريد الإلكتروني ولا استرجاع لكلمة مرور منسية.
 - لا يوجد حد لعدد محاولات الدخول الخاطئة (brute-force protection).
-- كلمات المرور تُشفَّر (لا تُحفظ نصاً صريحاً) لكن الملف الذي يحوي التشفير
-  (``users.json``) **يجب ألا يُرفع لمستودع GitHub عام** — أضفه إلى
-  ``.gitignore`` (موجود جاهزاً في هذا المشروع).
+- كلمات المرور تُشفَّر (لا تُحفظ نصاً صريحاً). ملفات ``users.json`` و``sessions.json``
+  و``user_data/`` **يجب ألا تُرفع لمستودع GitHub عام** (موجودة في ``.gitignore``).
 """
 
 import hashlib
 import json
 import re
 import secrets
+import time
 
+import storage
 from applog import logger
-from constants import USERS_FILE
+from constants import DATA_FILE, SESSION_DAYS
 
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_\-]{3,20}$")
 MIN_PASSWORD_LENGTH = 6
@@ -29,22 +32,6 @@ def is_valid_username(username: str) -> bool:
     return bool(USERNAME_PATTERN.match(username or ""))
 
 
-def _load_users() -> dict:
-    if not USERS_FILE.exists():
-        return {}
-    try:
-        return json.loads(USERS_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        logger.exception("تعذّرت قراءة %s.", USERS_FILE)
-        return {}
-
-
-def _save_users(users: dict) -> None:
-    USERS_FILE.write_text(
-        json.dumps(users, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-
-
 def _hash_password(password: str, salt: str) -> str:
     return hashlib.pbkdf2_hmac(
         "sha256", password.encode("utf-8"), salt.encode("utf-8"), 200_000
@@ -52,7 +39,10 @@ def _hash_password(password: str, salt: str) -> str:
 
 
 def create_user(username: str, password: str) -> tuple[bool, str]:
-    """ينشئ حساباً جديداً. يعيد (نجح, رسالة الخطأ إن فشل)."""
+    """ينشئ حساباً جديداً. يعيد (نجح, رسالة الخطأ إن فشل).
+
+    قد يرفع ``storage.StorageError`` لو تعذّر الوصول لمكان التخزين.
+    """
     username = (username or "").strip()
     if not is_valid_username(username):
         return False, (
@@ -62,14 +52,12 @@ def create_user(username: str, password: str) -> tuple[bool, str]:
     if len(password or "") < MIN_PASSWORD_LENGTH:
         return False, f"كلمة المرور يجب أن تكون {MIN_PASSWORD_LENGTH} أحرف على الأقل."
 
-    users = _load_users()
-    if username in users:
+    if storage.get("users", username) is not None:
         return False, "اسم المستخدم محجوز بالفعل، اختر اسماً آخر."
 
-    is_first_user = len(users) == 0
+    is_first_user = not storage.any_keys("users")
     salt = secrets.token_hex(16)
-    users[username] = {"salt": salt, "hash": _hash_password(password, salt)}
-    _save_users(users)
+    storage.put("users", username, {"salt": salt, "hash": _hash_password(password, salt)})
 
     if is_first_user:
         _migrate_legacy_data(username)
@@ -78,8 +66,7 @@ def create_user(username: str, password: str) -> tuple[bool, str]:
 
 
 def verify_login(username: str, password: str) -> bool:
-    users = _load_users()
-    record = users.get((username or "").strip())
+    record = storage.get("users", (username or "").strip())
     if not record:
         return False
     expected_hash = record.get("hash", "")
@@ -87,20 +74,56 @@ def verify_login(username: str, password: str) -> bool:
     return secrets.compare_digest(computed_hash, expected_hash)
 
 
+# ─── جلسات الدخول الدائمة (تبقى بعد تحديث الصفحة) ───────────────────────────
+# عند الدخول نُنشئ رمزاً عشوائياً طويلاً: نحفظ نسخته المشفّرة (SHA-256) في
+# التخزين، ونضع الرمز نفسه في كوكي بمتصفح المستخدم. عند فتح الصفحة (أو
+# تحديثها) نقرأ الكوكي ونطابقه فنُرجع المستخدم مسجَّلاً. الخروج يحذف الرمز
+# فيبطل مفعوله فوراً.
+
+
+def _hash_token(token: str) -> str:
+    return hashlib.sha256((token or "").encode("utf-8")).hexdigest()
+
+
+def create_session(username: str) -> str:
+    """ينشئ جلسة دائمة للمستخدم ويعيد الرمز الذي يوضع في الكوكي."""
+    token = secrets.token_urlsafe(32)
+    storage.put(
+        "sessions",
+        _hash_token(token),
+        {"user": username, "expires": time.time() + SESSION_DAYS * 86400},
+    )
+    return token
+
+
+def validate_session(token: str | None) -> str | None:
+    """يعيد اسم المستخدم لو الرمز صالح وغير منتهٍ، وإلا None."""
+    if not token:
+        return None
+    key = _hash_token(token)
+    record = storage.get("sessions", key)
+    if not record:
+        return None
+    if record.get("expires", 0) <= time.time():
+        storage.delete("sessions", key)
+        return None
+    # الحساب قد يكون حُذف بعد إنشاء الجلسة
+    return record["user"] if storage.get("users", record.get("user", "")) else None
+
+
+def delete_session(token: str | None) -> None:
+    if token:
+        storage.delete("sessions", _hash_token(token))
+
+
 def _migrate_legacy_data(username: str) -> None:
     """ينسخ بيانات ``saved_data.json`` القديمة (قبل إضافة الحسابات) لأول
     حساب يُنشأ، حتى لا تضيع الجداول التي أُدخلت قبل هذا التحديث.
     """
-    import persistence
-    from constants import DATA_FILE
-
-    if not DATA_FILE.exists():
-        return
-    target = persistence.user_data_file(username)
-    if target.exists():
+    if not DATA_FILE.exists() or storage.get("data", username) is not None:
         return
     try:
-        target.write_text(DATA_FILE.read_text(encoding="utf-8"), encoding="utf-8")
+        storage.put("data", username, json.loads(DATA_FILE.read_text(encoding="utf-8")))
         logger.info("تم ترحيل بيانات saved_data.json القديمة إلى الحساب %s.", username)
     except Exception:
         logger.exception("تعذّر ترحيل البيانات القديمة إلى الحساب %s.", username)
