@@ -2,5 +2,9 @@
   "fouad": {
     "salt": "141941ee5505c2a7866ce63d2854d658",
     "hash": "0b947c8d9195e92d9c3007e65bc8cc301a47b647175afb8ad057f78c7e5c9fca"
+  },
+  "Mjawadi": {
+    "salt": "911370a2ea4e4e3a94f51a42d392ea31",
+    "hash": "00272403c87d0eb2d62ee83f80a9539505cb6ea2b0b24c43dc9840b847ab3824"
   }
 }
