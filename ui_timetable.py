@@ -68,6 +68,10 @@ def _render_group_tab(
             f"يمكن إلغاء الربط لأي خانة والتعديل يدويًا."
         )
 
+    single_room = _single_room(room_options)
+    if single_room:
+        st.caption(f"🏫 القاعة الوحيدة «{single_room}» تُملأ تلقائياً في كل الخانات.")
+
     hdr = st.columns(COL_RATIOS)
     hdr[0].markdown("**اليوم ↓ / الوقت →**")
     for si, (lbl, _, is_pause) in enumerate(slots):
@@ -130,6 +134,11 @@ def _bare_teacher(teacher: str) -> str:
     if teacher.startswith("(") and teacher.endswith(")"):
         teacher = teacher[1:-1].strip()
     return teacher
+
+
+def _single_room(room_options):
+    """لو عُرّفت قاعة واحدة فقط، تُملأ تلقائياً بكل الخانات (لا حاجة لاختيارها)."""
+    return room_options[1] if len(room_options) == 2 else None
 
 
 def _room_for_cell(sel_room, room_options) -> str:
@@ -210,13 +219,19 @@ def _render_linked_cell(
 ) -> None:
     src_si = slot_pair[si]
     src_val = str(st.session_state.timetables[source_g].at[day, all_time_slots[src_si]])
-    rk = state_keys.room_key(g, di, si)
-    current_room = models.cell_parts(st.session_state.timetables[g].at[day, slot])[3]
-    if rk not in st.session_state or st.session_state[rk] not in room_options:
-        st.session_state[rk] = (
-            current_room if current_room in room_options else room_options[0]
+    single_room = _single_room(room_options)
+    if single_room:
+        sel_room = single_room
+    else:
+        rk = state_keys.room_key(g, di, si)
+        current_room = models.cell_parts(st.session_state.timetables[g].at[day, slot])[3]
+        if rk not in st.session_state or st.session_state[rk] not in room_options:
+            st.session_state[rk] = (
+                current_room if current_room in room_options else room_options[0]
+            )
+        sel_room = st.selectbox(
+            "القاعة", room_options, key=rk, label_visibility="collapsed"
         )
-    sel_room = st.selectbox("القاعة", room_options, key=rk, label_visibility="collapsed")
     cell_value = models.cell_with_room(src_val, _room_for_cell(sel_room, room_options))
     st.session_state.timetables[g].at[day, slot] = cell_value
 
@@ -251,12 +266,18 @@ def _render_manual_cell(
         "أ", courses_data[sel_course], key=tk, label_visibility="collapsed"
     )
 
-    rk = state_keys.room_key(g, di, si)
-    if rk not in st.session_state or st.session_state[rk] not in room_options:
-        st.session_state[rk] = (
-            stored_room if stored_room in room_options else room_options[0]
+    single_room = _single_room(room_options)
+    if single_room:
+        sel_room = single_room
+    else:
+        rk = state_keys.room_key(g, di, si)
+        if rk not in st.session_state or st.session_state[rk] not in room_options:
+            st.session_state[rk] = (
+                stored_room if stored_room in room_options else room_options[0]
+            )
+        sel_room = st.selectbox(
+            "القاعة", room_options, key=rk, label_visibility="collapsed"
         )
-    sel_room = st.selectbox("القاعة", room_options, key=rk, label_visibility="collapsed")
 
     ek = state_keys.exam_type_key(g, di, si)
     if ek not in st.session_state:

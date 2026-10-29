@@ -104,7 +104,10 @@ def render_settings_expander(current_page: str) -> None:
                 st.time_input(f"نهاية الفترة {index + 1}", key=end_key)
 
         st.markdown("**أسماء القاعات**")
-        st.caption("اكتب اسم قاعة واحدة في كل سطر، مثل: Salle 1 أو Amphi 2.")
+        st.caption(
+            "اكتب اسم قاعة واحدة في كل سطر، مثل: Salle 1 أو Amphi 2. "
+            "لو كتبت **قاعة واحدة فقط** تُملأ تلقائياً في كل خانات الجدول."
+        )
         st.session_state.setdefault(
             "config_rooms",
             "\n".join(st.session_state.get("rooms", [])),

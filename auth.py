@@ -74,6 +74,35 @@ def verify_login(username: str, password: str) -> bool:
     return secrets.compare_digest(computed_hash, expected_hash)
 
 
+def get_account_record(username: str) -> dict | None:
+    """بصمة الحساب المحفوظة (salt + hash) — تُنسخ إلى سجل المتصفح."""
+    record = storage.get("users", username)
+    if isinstance(record, dict) and record.get("salt") and record.get("hash"):
+        return {"salt": record["salt"], "hash": record["hash"]}
+    return None
+
+
+def restore_account(username: str, password: str, record) -> bool:
+    """يعيد إنشاء حساب فُقد من السيرفر، من نسخة محفوظة بمتصفح صاحبه.
+
+    يشترط أن تكون كلمة المرور صحيحة (تُطابَق مع البصمة المحفوظة بالمتصفح)، وألا
+    يكون الحساب موجوداً بالسيرفر (لا نكتب فوق حساب موجود).
+    """
+    username = (username or "").strip()
+    if not is_valid_username(username) or not isinstance(record, dict):
+        return False
+    salt, expected = record.get("salt"), record.get("hash")
+    if not salt or not expected:
+        return False
+    if storage.get("users", username) is not None:
+        return False
+    if not secrets.compare_digest(_hash_password(password or "", salt), expected):
+        return False
+    storage.put("users", username, {"salt": salt, "hash": expected})
+    logger.info("أُعيد إنشاء الحساب %s من سجل المتصفح.", username)
+    return True
+
+
 # ─── جلسات الدخول الدائمة (تبقى بعد تحديث الصفحة) ───────────────────────────
 # عند الدخول نُنشئ رمزاً عشوائياً طويلاً: نحفظ نسخته المشفّرة (SHA-256) في
 # التخزين، ونضع الرمز نفسه في كوكي بمتصفح المستخدم. عند فتح الصفحة (أو

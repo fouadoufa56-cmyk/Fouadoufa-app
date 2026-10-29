@@ -4,6 +4,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 import auth
+import browser_store
 import storage
 from constants import SESSION_COOKIE, SESSION_DAYS
 
@@ -49,6 +50,32 @@ def _clear_cookie() -> None:
     )
 
 
+def _start_session(username: str) -> None:
+    st.session_state["auth_token"] = auth.create_session(username)
+    st.session_state["auth_user"] = username
+    st.rerun()
+
+
+def sync_account_registry() -> None:
+    """يحدّث سجل الحسابات بالمتصفح (يُستدعى بعد الدخول)، ويحافظ على بقية الحسابات.
+
+    لو فُقد الحساب لاحقاً من السيرفر، يُعاد إنشاؤه من هذا السجل عند الدخول.
+    """
+    with st.sidebar:
+        registry, loaded = browser_store.read_accounts()
+        if not loaded:
+            return
+        username = st.session_state["auth_user"]
+        if "_my_account_record" not in st.session_state:
+            try:
+                st.session_state["_my_account_record"] = auth.get_account_record(username)
+            except storage.StorageError:
+                return
+        record = st.session_state["_my_account_record"]
+        if record:
+            browser_store.write_accounts({**registry, username: record})
+
+
 def render_session_cookie() -> None:
     """يجدّد كوكي الدخول كل تشغيل (يُستدعى بعد نجاح الدخول)."""
     token = st.session_state.get("auth_token")
@@ -78,6 +105,8 @@ def render_login_gate() -> bool:
         st.session_state["auth_token"] = cookie_token
         return True
 
+    registry, _loaded = browser_store.read_accounts()  # حسابات هذا المتصفح (لاستعادة حساب فُقد)
+
     st.title("📆 نظام جدولة الحصص والامتحانات")
     st.caption("لكل مستخدم حسابه وجدوله الخاص. سجّل الدخول أو أنشئ حساباً جديداً للمتابعة.")
 
@@ -93,11 +122,13 @@ def render_login_gate() -> bool:
                 "دخول", use_container_width=True, type="primary"
             )
         if submitted:
+            uname = username.strip()
             try:
-                if auth.verify_login(username, password):
-                    st.session_state["auth_token"] = auth.create_session(username.strip())
-                    st.session_state["auth_user"] = username.strip()
-                    st.rerun()
+                ok = auth.verify_login(uname, password) or auth.restore_account(
+                    uname, password, registry.get(uname)
+                )
+                if ok:
+                    _start_session(uname)
                 else:
                     st.error("اسم المستخدم أو كلمة المرور غير صحيحة.")
             except storage.StorageError:
@@ -122,13 +153,18 @@ def render_login_gate() -> bool:
         if submitted_signup:
             if new_password != new_password_confirm:
                 st.error("كلمتا المرور غير متطابقتين.")
+            elif new_username.strip() in registry:
+                st.error(
+                    "هذا الحساب موجود بهذا المتصفح. ادخل من تبويب «تسجيل الدخول» "
+                    "بكلمة مروره (حتى لو غاب من السيرفر يُعاد تلقائياً)."
+                )
             else:
                 try:
                     ok, message = auth.create_user(new_username, new_password)
                 except storage.StorageError:
                     ok, message = False, STORAGE_DOWN
                 if ok:
-                    st.success("تم إنشاء الحساب بنجاح! افتح تبويب «تسجيل الدخول» وادخل به.")
+                    _start_session(new_username.strip())  # دخول مباشر بعد إنشاء الحساب
                 else:
                     st.error(message)
 

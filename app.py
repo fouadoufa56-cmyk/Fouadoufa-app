@@ -46,6 +46,7 @@ def main() -> None:
     username = st.session_state["auth_user"]
     ui_auth.render_session_cookie()
     ui_auth.render_logout_button()
+    ui_auth.sync_account_registry()
 
     # نقرأ نسخة المتصفح قبل تحميل البيانات، ليُفتح الأحدث بين السيرفر والمتصفح
     browser_store.read_copy(username)

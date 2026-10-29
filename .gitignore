@@ -15,3 +15,6 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# يُنشأ تلقائياً عند التشغيل من browser_store.py
+browser_store_frontend/
