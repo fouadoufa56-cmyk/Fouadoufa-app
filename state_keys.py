@@ -25,6 +25,11 @@ def merge_key(g: str, di: int, si: int) -> str:
     return f"m_{g}_{di}_{si}"
 
 
+def merge_targets_key(g: str, di: int, si: int) -> str:
+    """الأقسام التي اختار المستخدم جمعها مع هذه الخانة."""
+    return f"mg_{g}_{di}_{si}"
+
+
 def room_key(g: str, di: int, si: int) -> str:
     return f"r_{g}_{di}_{si}"
 

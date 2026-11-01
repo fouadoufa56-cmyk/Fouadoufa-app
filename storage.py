@@ -113,11 +113,14 @@ class LocalBackend:
                 )
 
     def any_keys(self, ns):
+        return self.count_keys(ns) > 0
+
+    def count_keys(self, ns):
         path = self._dict_file(ns)
         if path is None or not path.exists():
-            return False
+            return 0
         with self._lock(path):
-            return bool(self._read(path))
+            return len(self._read(path))
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -173,7 +176,10 @@ class RemoteBackend:
         self._call("DELETE", self._where(ns, key), extra={"Prefer": "return=minimal"})
 
     def any_keys(self, ns):
-        return bool(self._call("GET", self._where(ns) + "&select=key&limit=1"))
+        return self.count_keys(ns) > 0
+
+    def count_keys(self, ns):
+        return len(self._call("GET", self._where(ns) + "&select=key") or [])
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -216,3 +222,7 @@ def delete(ns, key):
 
 def any_keys(ns):
     return backend().any_keys(ns)
+
+
+def count_keys(ns):
+    return backend().count_keys(ns)

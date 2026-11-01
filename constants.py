@@ -50,6 +50,7 @@ LEGACY_TIME_SLOT_KEYS = [
 DATA_DIR = Path(__file__).parent / "user_data"
 USERS_FILE = Path(__file__).parent / "users.json"
 SESSIONS_FILE = Path(__file__).parent / "sessions.json"
+MAX_ACCOUNTS = 3  # أقصى عدد حسابات. عند بلوغه يختفي «إنشاء حساب جديد». غيّر الرقم لو احتجت أكثر
 SESSION_COOKIE = "tt_session"
 SESSION_DAYS = 30  # مدة بقاء تسجيل الدخول بعد آخر دخول، حتى لو حدّثت الصفحة أو أغلقت المتصفح
 
@@ -60,7 +61,7 @@ DATA_FILE = Path(__file__).parent / "saved_data.json"
 
 # مفاتيح session_state الخاصة بخانات الجدول التفاعلي، تُستخدم لتفريغها عند
 # تبديل الصفحة أو تحميل إعدادات جديدة.
-PROFILE_KEY_PREFIXES = ("c_", "t_", "e_", "m_", "r_", "link_", "config_")
+PROFILE_KEY_PREFIXES = ("c_", "t_", "e_", "m_", "mg_", "r_", "link_", "config_")
 
 # ─── رأس ملف PDF ─────────────────────────────────────────────────────────────
 PDF_TITLE_BASE = "EMPLOI DU TEMPS TECHNICIENS SPECIALISES GENIE CIVIL"

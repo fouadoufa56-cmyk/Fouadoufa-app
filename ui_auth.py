@@ -110,7 +110,15 @@ def render_login_gate() -> bool:
     st.title("📆 نظام جدولة الحصص والامتحانات")
     st.caption("لكل مستخدم حسابه وجدوله الخاص. سجّل الدخول أو أنشئ حساباً جديداً للمتابعة.")
 
-    tab_login, tab_signup = st.tabs(["🔑 تسجيل الدخول", "🆕 إنشاء حساب جديد"])
+    try:
+        can_signup = auth.can_create_more()
+    except storage.StorageError:
+        can_signup = True
+    if can_signup:
+        tab_login, tab_signup = st.tabs(["🔑 تسجيل الدخول", "🆕 إنشاء حساب جديد"])
+    else:
+        (tab_login,) = st.tabs(["🔑 تسجيل الدخول"])
+        tab_signup = None
 
     with tab_login:
         with st.form("login_form"):
@@ -134,39 +142,41 @@ def render_login_gate() -> bool:
             except storage.StorageError:
                 st.error(STORAGE_DOWN)
 
-    with tab_signup:
-        st.caption(
-            "اسم المستخدم: 3 إلى 20 حرفاً/رقماً (يُسمح بـ _ و-، بدون مسافات). "
-            "كلمة المرور: 6 أحرف على الأقل."
-        )
-        with st.form("signup_form"):
-            new_username = st.text_input("اختر اسم مستخدم", key="signup_username")
-            new_password = st.text_input(
-                "اختر كلمة مرور", type="password", key="signup_password"
+    if tab_signup is not None:
+        with tab_signup:
+            st.caption(
+                "اسم المستخدم: 3 إلى 20 حرفاً/رقماً (يُسمح بـ _ و-، بدون مسافات). "
+                "كلمة المرور: 6 أحرف على الأقل."
             )
-            new_password_confirm = st.text_input(
-                "أكّد كلمة المرور", type="password", key="signup_password_confirm"
-            )
-            submitted_signup = st.form_submit_button(
-                "إنشاء الحساب", use_container_width=True
-            )
-        if submitted_signup:
-            if new_password != new_password_confirm:
-                st.error("كلمتا المرور غير متطابقتين.")
-            elif new_username.strip() in registry:
-                st.error(
-                    "هذا الحساب موجود بهذا المتصفح. ادخل من تبويب «تسجيل الدخول» "
-                    "بكلمة مروره (حتى لو غاب من السيرفر يُعاد تلقائياً)."
+            with st.form("signup_form"):
+                new_username = st.text_input("اختر اسم مستخدم", key="signup_username")
+                new_password = st.text_input(
+                    "اختر كلمة مرور", type="password", key="signup_password"
                 )
-            else:
-                try:
-                    ok, message = auth.create_user(new_username, new_password)
-                except storage.StorageError:
-                    ok, message = False, STORAGE_DOWN
-                if ok:
-                    _start_session(new_username.strip())  # دخول مباشر بعد إنشاء الحساب
+                new_password_confirm = st.text_input(
+                    "أكّد كلمة المرور", type="password", key="signup_password_confirm"
+                )
+                submitted_signup = st.form_submit_button(
+                    "إنشاء الحساب", use_container_width=True
+                )
+            if submitted_signup:
+                if new_password != new_password_confirm:
+                    st.error("كلمتا المرور غير متطابقتين.")
+                elif new_username.strip() in registry:
+                    st.error(
+                        "هذا الحساب موجود بهذا المتصفح. ادخل من تبويب «تسجيل الدخول» "
+                        "بكلمة مروره (حتى لو غاب من السيرفر يُعاد تلقائياً)."
+                    )
                 else:
-                    st.error(message)
+                    try:
+                        ok, message = auth.create_user(new_username, new_password)
+                    except storage.StorageError:
+                        ok, message = False, STORAGE_DOWN
+                    if ok:
+                        _start_session(new_username.strip())  # دخول مباشر بعد إنشاء الحساب
+                    else:
+                        st.error(message)
+
 
     # لا أحد مسجَّل هنا: نمسح أي كوكي قديم أو منتهٍ
     _clear_cookie()

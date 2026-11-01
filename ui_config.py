@@ -12,14 +12,19 @@ from constants import DEFAULT_TIME_SLOTS, LEGACY_COURSES_DATA
 
 def render_header(page_label: str) -> None:
     st.title(f"📆 نظام جدولة الحصص والامتحانات — {page_label}")
-    saved_at = st.session_state.get("_saved_at", "")
-    if saved_at:
-        try:
-            dt = datetime.fromisoformat(saved_at)
-            st.caption(f"💾 آخر حفظ: {dt.strftime('%d/%m/%Y  %H:%M:%S')}")
-        except Exception:
-            logger.warning("وقت آخر حفظ غير صالح: %r", saved_at)
     st.write("---")
+
+
+def render_saved_at() -> None:
+    """وقت آخر حفظ (يُرسم داخل منطقة العمل ليتحدّث مع كل تعديل)."""
+    saved_at = st.session_state.get("_saved_at", "")
+    if not saved_at:
+        return
+    try:
+        dt = datetime.fromisoformat(saved_at)
+        st.caption(f"💾 آخر حفظ: {dt.strftime('%d/%m/%Y  %H:%M:%S')}")
+    except Exception:
+        logger.warning("وقت آخر حفظ غير صالح: %r", saved_at)
 
 
 def render_settings_expander(current_page: str) -> None:

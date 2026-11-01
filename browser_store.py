@@ -130,12 +130,16 @@ def read_copy(username: str) -> None:
         st.session_state["_browser_raw"] = result.get("value")
 
 
-def write_copy(username: str) -> None:
-    """يكتب آخر نسخة محفوظة في المتصفح (يُستدعى كل تشغيل بعد الحفظ)."""
+def write_copy(username: str, sidebar: bool = True) -> None:
+    """يكتب آخر نسخة محفوظة في المتصفح (يُستدعى كل تشغيل بعد الحفظ).
+
+    ``sidebar=False`` عند الاستدعاء من داخل fragment (لا يُسمح له بكتابة مكوّنات
+    في الشريط الجانبي)، فيُرسم المكوّن (بلا ارتفاع) في مكان الاستدعاء.
+    """
     payload = st.session_state.get("_browser_payload")
     if _component is None or not payload or st.session_state.get("_skip_browser"):
         return
-    with st.sidebar:
+    with (st.sidebar if sidebar else st.container()):
         _component(
             action="set",
             store_key=_store_key(username),

@@ -36,6 +36,60 @@ from constants import (
 )
 
 
+# يحدّث الجدول وحده عند أي تعديل (Streamlit 1.37+؛ بنسخ أقدم قليلاً يُسمّى
+# experimental_fragment؛ وبدونهما تعمل الصفحة كلها كالمعتاد بلا تسريع).
+_fragment = (
+    getattr(st, "fragment", None)
+    or getattr(st, "experimental_fragment", None)
+    or (lambda func: func)
+)
+
+
+@_fragment
+def _work_area(
+    username,
+    groups,
+    group_names,
+    courses_data,
+    active_course_list,
+    room_options,
+    slots,
+    days,
+    group_source,
+    pdf_title,
+    pdf_left_header,
+    pdf_right_header,
+) -> None:
+    """كل ما يتأثر بتعديل خانة يعيش هنا، فيُعاد تشغيله وحده بدل الصفحة كلها.
+
+    لذلك الحفظ (على السيرفر والمتصفح) وتحميل الملفات داخله أيضاً: بدونه كان
+    التعديل لا يُحفظ ولا يُلغي الملفات القديمة إلا عند تحديث الصفحة كلها.
+    """
+    ui_timetable.render_timetable_tabs(
+        groups,
+        group_names,
+        courses_data,
+        active_course_list,
+        room_options,
+        slots,
+        SLOT_PAIR,
+        group_source,
+        days,
+    )
+    st.write("---")
+
+    # حفظ تلقائي بعد كل تعديل. يأتي قبل قسم التحميل عمداً: لو فشل توليد PDF أو
+    # غاب مجلد الخطوط (st.stop) يبقى كل ما عدّلته محفوظاً.
+    persistence.save_data()
+    browser_store.write_copy(username, sidebar=False)
+    ui_config.render_saved_at()
+
+    pdf_export.ensure_fonts_or_stop()
+    ui_downloads.render_downloads(
+        groups, group_names, slots, days, pdf_title, pdf_left_header, pdf_right_header
+    )
+
+
 def main() -> None:
     st.set_page_config(layout="wide", page_title="جدول الحصص")
 
@@ -102,30 +156,20 @@ def main() -> None:
     ui_config.render_date_expander()
     active_course_list = ui_config.render_active_courses_filter(course_list)
 
-    # ── الجدول التفاعلي ───────────────────────────────────────────────────
-    ui_timetable.render_timetable_tabs(
+    # ── منطقة العمل: الجدول + الحفظ + التحميل (تتحدّث لوحدها دون إعادة الصفحة) ──
+    _work_area(
+        username,
         groups,
         group_names,
         courses_data,
         active_course_list,
         room_options,
         slots,
-        SLOT_PAIR,
-        group_source,
         days,
-    )
-    st.write("---")
-
-    # ── حفظ تلقائي بعد كل تعديل ───────────────────────────────────────────
-    # يأتي قبل قسم التحميل عمداً: لو فشل توليد PDF أو غاب مجلد الخطوط
-    # (st.stop) يبقى كل ما عدّلته محفوظاً.
-    persistence.save_data()
-    browser_store.write_copy(username)
-
-    # ── التحميل (PDF / Excel) ─────────────────────────────────────────────
-    pdf_export.ensure_fonts_or_stop()
-    ui_downloads.render_downloads(
-        groups, group_names, slots, days, pdf_title, pdf_left_header, pdf_right_header
+        group_source,
+        pdf_title,
+        pdf_left_header,
+        pdf_right_header,
     )
 
 

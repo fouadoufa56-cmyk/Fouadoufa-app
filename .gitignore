@@ -1,5 +1,6 @@
 # بيانات حساسة — لا تُرفع لأي مستودع GitHub عام أبداً
-users.json
+# users.json يُرفع عمداً لـ GitHub (مستودع Private!) ليبقى حساباتك بعد إعادة تشغيل السيرفر.
+# لو أضفته بـ git add عادي وتجاهله Git، استعمل:  git add -f users.json
 sessions.json
 user_data/
 

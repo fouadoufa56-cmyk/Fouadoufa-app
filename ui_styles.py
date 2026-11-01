@@ -10,6 +10,8 @@ LINK_BORDER = "#1c66a8"
 WARNING_BG = "#ffe0e0"
 WARNING_BORDER = "#c00"
 MUTED = "#999"
+MERGE_BG = "#efe3ff"
+MERGE_BORDER = "#7a3fc4"
 
 
 def header_badge(text: str, is_pause: bool = False) -> None:
@@ -64,5 +66,16 @@ def conflict_warning(messages: list[str]) -> None:
         f"border-radius:5px;padding:3px 6px;font-size:10px'>⚠️ "
         + " | ".join(messages)
         + "</div>",
+        unsafe_allow_html=True,
+    )
+
+
+def merged_summary(owner_label: str, course: str, teacher: str, room: str) -> None:
+    """خانة قسم تم جمعها مع قسم آخر: تظهر القيم المنسوخة (للقراءة فقط)."""
+    room_html = f"<br><small>{room}</small>" if room else ""
+    st.markdown(
+        f"<div style='background:{MERGE_BG};border-right:3px solid {MERGE_BORDER};"
+        f"border-radius:5px;padding:6px 4px;font-size:11px;text-align:center'>"
+        f"🧷 جمع مع {owner_label}<br><b>{course}</b><br>{teacher}{room_html}</div>",
         unsafe_allow_html=True,
     )

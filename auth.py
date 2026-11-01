@@ -22,7 +22,7 @@ import time
 
 import storage
 from applog import logger
-from constants import DATA_FILE, SESSION_DAYS
+from constants import DATA_FILE, MAX_ACCOUNTS, SESSION_DAYS
 
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_\-]{3,20}$")
 MIN_PASSWORD_LENGTH = 6
@@ -36,6 +36,11 @@ def _hash_password(password: str, salt: str) -> str:
     return hashlib.pbkdf2_hmac(
         "sha256", password.encode("utf-8"), salt.encode("utf-8"), 200_000
     ).hex()
+
+
+def can_create_more() -> bool:
+    """هل ما زال مسموحاً إنشاء حساب جديد (لم نبلغ ``MAX_ACCOUNTS``)؟"""
+    return storage.count_keys("users") < MAX_ACCOUNTS
 
 
 def create_user(username: str, password: str) -> tuple[bool, str]:
@@ -54,6 +59,8 @@ def create_user(username: str, password: str) -> tuple[bool, str]:
 
     if storage.get("users", username) is not None:
         return False, "اسم المستخدم محجوز بالفعل، اختر اسماً آخر."
+    if not can_create_more():
+        return False, f"تم بلوغ الحد الأقصى للحسابات ({MAX_ACCOUNTS})."
 
     is_first_user = not storage.any_keys("users")
     salt = secrets.token_hex(16)
@@ -94,7 +101,7 @@ def restore_account(username: str, password: str, record) -> bool:
     salt, expected = record.get("salt"), record.get("hash")
     if not salt or not expected:
         return False
-    if storage.get("users", username) is not None:
+    if storage.get("users", username) is not None or not can_create_more():
         return False
     if not secrets.compare_digest(_hash_password(password or "", salt), expected):
         return False

@@ -31,11 +31,16 @@ def render_timetable_tabs(
 ) -> None:
     all_time_slots = [slot[1] for slot in slots]
 
+    # الخانات التي ستُملأ تلقائياً بسبب «جمع» قسم آخر: {(قسم، يوم، فترة): القسم المالك}
+    owners = _merge_owners(groups, group_source, len(days), slots)
+    _release_unmerged(owners, days, slots)
+
     tabs = st.tabs([f"📋 القسم {g} — {group_names[g]}" for g in groups])
     for tab, g in zip(tabs, groups):
         with tab:
             _render_group_tab(
                 g,
+                groups,
                 group_names,
                 courses_data,
                 active_course_list,
@@ -45,11 +50,16 @@ def render_timetable_tabs(
                 slot_pair,
                 group_source,
                 days,
+                owners,
             )
+
+    if _sync_merged_targets(owners, days, slots):
+        st.rerun()  # يحدّث العرض بعد نسخ قيم كانت خلف قسم عُرض لاحقاً
 
 
 def _render_group_tab(
     g,
+    groups,
     group_names,
     courses_data,
     active_course_list,
@@ -59,6 +69,7 @@ def _render_group_tab(
     slot_pair,
     group_source,
     days,
+    owners,
 ) -> None:
     source_g = group_source.get(g)
     if source_g:
@@ -103,6 +114,9 @@ def _render_group_tab(
                     room_options,
                     courses_data,
                     active_course_list,
+                    groups,
+                    group_names,
+                    owners.get((g, di, si)),
                 )
 
     st.write("---")
@@ -146,6 +160,77 @@ def _room_for_cell(sel_room, room_options) -> str:
     return "" if sel_room == room_options[0] else sel_room
 
 
+def _is_merge_owner(x, di, si, group_source) -> bool:
+    """هل خانة القسم x (يوم di، فترة si) تقوم بـ«جمع» مع أقسام أخرى؟"""
+    if not st.session_state.get(state_keys.merge_key(x, di, si)):
+        return False
+    if not st.session_state.get(state_keys.merge_targets_key(x, di, si)):
+        return False
+    if st.session_state.get(state_keys.course_key(x, di, si), EMPTY_COURSE) == EMPTY_COURSE:
+        return False
+    if x in group_source and st.session_state.get(state_keys.link_key(x, di, si), True):
+        return False  # الخانة المرتبطة تتبع قسمها المصدر ولا تُجمع بنفسها
+    return True
+
+
+def _merge_owners(groups, group_source, n_days, slots) -> dict:
+    """يحسب الخانات المجموعة: {(قسم هدف، يوم، فترة): القسم المالك}.
+
+    الأولوية لترتيب الأقسام: القسم الأسبق يملك، ولا يُستبدل قسم مالك بقسم أسبق
+    منه ولا يملك قسمٌ هو نفسه هدف لغيره (لتفادي التضارب والحلقات).
+    """
+    owners = {}
+    for di in range(n_days):
+        for si, (_label, _slot, is_pause) in enumerate(slots):
+            if is_pause:
+                continue
+            targets_taken, active_owners = set(), []
+            for x in groups:
+                if x in targets_taken or not _is_merge_owner(x, di, si, group_source):
+                    continue
+                claimed = False
+                for t in st.session_state.get(state_keys.merge_targets_key(x, di, si), []):
+                    if t == x or t not in groups or t in targets_taken or t in active_owners:
+                        continue
+                    targets_taken.add(t)
+                    owners[(t, di, si)] = x
+                    claimed = True
+                if claimed:
+                    active_owners.append(x)
+    return owners
+
+
+def _release_unmerged(owners, days, slots) -> None:
+    """خانات كانت مجموعة وانفكّ جمعها: تُفرَّغ (وتُنسى قوائمها) لتبدأ من جديد."""
+    previous = st.session_state.get("_merge_targets_prev", set())
+    for (g, di, si) in previous - set(owners):
+        st.session_state.timetables[g].at[days[di], slots[si][1]] = ""
+        prefixes = (
+            state_keys.course_key(g, di, si),
+            state_keys.exam_type_key(g, di, si),
+            state_keys.merge_key(g, di, si),
+            state_keys.merge_targets_key(g, di, si),
+            state_keys.room_key(g, di, si),
+            f"t_{g}_{di}_{si}_",
+        )
+        for key in list(st.session_state.keys()):
+            if isinstance(key, str) and key.startswith(prefixes):
+                del st.session_state[key]
+    st.session_state["_merge_targets_prev"] = set(owners)
+
+
+def _sync_merged_targets(owners, days, slots) -> bool:
+    """بعد رسم كل الأقسام: يتأكد أن كل خانة هدف تطابق خانة مالكها. يعيد True لو غيّر شيئاً."""
+    changed = False
+    for (target, di, si), owner in owners.items():
+        day, slot = days[di], slots[si][1]
+        wanted = str(st.session_state.timetables[owner].at[day, slot])
+        if str(st.session_state.timetables[target].at[day, slot]) != wanted:
+            st.session_state.timetables[target].at[day, slot] = wanted
+            changed = True
+    return changed
+
+
 def _render_cell(
     g,
     day,
@@ -158,7 +243,20 @@ def _render_cell(
     room_options,
     courses_data,
     active_course_list,
+    groups,
+    group_names,
+    merge_owner,
 ) -> None:
+    if merge_owner:
+        # خانة جُمعت مع قسم آخر: تأخذ نسخة من خانته (المادة والأستاذ والقاعة والنوع)
+        owner_text = str(st.session_state.timetables[merge_owner].at[day, slot])
+        st.session_state.timetables[g].at[day, slot] = owner_text
+        _, m_course, m_teacher, m_room = models.cell_parts(owner_text)
+        ui_styles.merged_summary(
+            f"{merge_owner} — {group_names[merge_owner]}", m_course, m_teacher, m_room
+        )
+        return
+
     if source_g:
         lk = state_keys.link_key(g, di, si)
         if lk not in st.session_state:
@@ -189,7 +287,10 @@ def _render_cell(
     )
 
     if sel_course != EMPTY_COURSE:
-        _render_manual_cell(g, day, di, si, slot, sel_course, room_options, courses_data)
+        _render_manual_cell(
+            g, day, di, si, slot, sel_course, room_options, courses_data,
+            groups, group_names,
+        )
     else:
         st.session_state.timetables[g].at[day, slot] = ""
         st.session_state.pop(state_keys.room_key(g, di, si), None)
@@ -253,7 +354,7 @@ def _render_linked_cell(
 
 
 def _render_manual_cell(
-    g, day, di, si, slot, sel_course, room_options, courses_data
+    g, day, di, si, slot, sel_course, room_options, courses_data, groups, group_names
 ) -> None:
     stored_prefix, _, stored_teacher, stored_room = models.cell_parts(
         st.session_state.timetables[g].at[day, slot]
@@ -291,7 +392,28 @@ def _render_manual_cell(
     mk = state_keys.merge_key(g, di, si)
     if mk not in st.session_state:
         st.session_state[mk] = "[MERGE]" in stored_prefix
-    merged = st.checkbox("جمع", key=mk, help="جمع مجموعتين — لا يُعطي تعارض")
+    merged = st.checkbox(
+        "جمع",
+        key=mk,
+        help="جمع مع قسم آخر: يدخل القسمان نفس القاعة ونفس الأستاذ في نفس الوقت، "
+        "ويُسجَّل الدرس تلقائياً في جدول القسم الذي تختاره.",
+    )
+    if merged:
+        others = [x for x in groups if x != g]
+        if others:
+            mtk = state_keys.merge_targets_key(g, di, si)
+            st.session_state[mtk] = [
+                x for x in st.session_state.get(mtk, []) if x in others
+            ]
+            if not st.session_state[mtk]:
+                st.caption("اختر القسم المراد جمعه 👇")
+            st.multiselect(
+                "جمع مع",
+                others,
+                key=mtk,
+                format_func=lambda x: f"{x} — {group_names[x]}",
+                label_visibility="collapsed",
+            )
 
     prefix = ""
     if sel_exam == "Controle":
