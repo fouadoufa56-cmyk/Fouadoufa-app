@@ -320,6 +320,10 @@ def _render_linked_cell(
 ) -> None:
     src_si = slot_pair[si]
     src_val = str(st.session_state.timetables[source_g].at[day, all_time_slots[src_si]])
+    # خانة «جمع» لا تُنسخ بالربط: الذي يأخذها (ويتلوّن أزرق) هو القسم المختار فقط
+    source_is_merge = "[MERGE]" in src_val
+    if source_is_merge:
+        src_val = ""
     single_room = _single_room(room_options)
     if single_room:
         sel_room = single_room
@@ -350,7 +354,7 @@ def _render_linked_cell(
             parts[2] if len(parts) > 2 else "",
         )
     else:
-        ui_styles.empty_placeholder()
+        ui_styles.empty_placeholder("🧷 جمع — لا يُنسخ" if source_is_merge else "-- فارغ --")
 
 
 def _render_manual_cell(

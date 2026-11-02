@@ -1,5 +1,5 @@
 """
-أزرار تحميل الجداول: PDF لكل قسم، PDF شامل، Excel، وتفريغ الجداول.
+أزرار تحميل الجداول: PDF لكل قسم، PDF شامل، وتفريغ الجداول.
 
 الملفات **لا تُبنى تلقائياً** مع كل تعديل (كان هذا أثقل جزء في التطبيق). تضغط
 «جهّز» فيُبنى الملف مرة واحدة ويظهر زر التحميل. وإن عدّلت الجدول بعدها يُلغى
@@ -7,10 +7,8 @@
 """
 
 import hashlib
-import io
 import json
 
-import pandas as pd
 import streamlit as st
 
 import pdf_export
@@ -54,14 +52,6 @@ def _file_slot(container, cache, fingerprint, key, prepare_label, download_label
         )
 
 
-def _excel_bytes(groups) -> bytes:
-    buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-        for g in groups:
-            st.session_state.timetables[g].to_excel(writer, sheet_name=f"Groupe {g}")
-    return buffer.getvalue()
-
-
 def render_downloads(
     groups: list[str],
     group_names: dict[str, str],
@@ -101,7 +91,7 @@ def render_downloads(
             )
 
     st.write("")
-    c1, c2, _c3, c4 = st.columns(4)
+    c1, _c2, _c3, c4 = st.columns(4)
 
     _file_slot(
         c1, cache, fingerprint, "pdf_all",
@@ -111,13 +101,6 @@ def render_downloads(
             groups, group_names, st.session_state.timetables, pdf_title, date_str,
             slots, days, pdf_left_header, pdf_right_header,
         ),
-    )
-    _file_slot(
-        c2, cache, fingerprint, "excel",
-        "⚙️ جهّز Excel — جميع الأقسام", "📥 تحميل Excel — جميع الأقسام",
-        "emploi_du_temps.xlsx",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        lambda: _excel_bytes(groups),
     )
 
     with c4:

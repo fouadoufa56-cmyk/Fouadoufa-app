@@ -13,7 +13,7 @@
 - ui_pages.py        واجهة الشريط الجانبي (اختيار/إدارة الصفحات)
 - ui_config.py        واجهة إعداد الأقسام/المواد/الأساتذة/التوقيت
 - ui_timetable.py      الجدول التفاعلي (تبويبات الأقسام)
-- ui_downloads.py      أزرار تحميل PDF/Excel
+- ui_downloads.py      أزرار تحميل PDF
 """
 
 import streamlit as st
